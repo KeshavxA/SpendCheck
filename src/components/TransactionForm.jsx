@@ -59,8 +59,7 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
     } else {
       addTransaction(transaction);
     }
-
-    // Reset form
+    
     setFormData({
       type: TRANSACTION_TYPES.EXPENSE,
       amount: '',
@@ -78,7 +77,6 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
       [name]: value,
       ...(name === 'type' && { category: '' })
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -91,7 +89,6 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Type Toggle */}
         <div className="flex gap-2">
           <button
             type="button"
@@ -100,7 +97,7 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
               type: TRANSACTION_TYPES.EXPENSE,
               category: '' 
             }))}
-            className={`${
+            className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
               formData.type === TRANSACTION_TYPES.EXPENSE
                 ? 'bg-red-500 text-white'
                 : 'bg-gray-100 text-gray-700'
@@ -115,7 +112,7 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
               type: TRANSACTION_TYPES.INCOME,
               category: '' 
             }))}
-            className={`${
+            className={`flex-1 py-2 rounded-lg font-medium transition-colors ${
               formData.type === TRANSACTION_TYPES.INCOME
                 ? 'bg-green-500 text-white'
                 : 'bg-gray-100 text-gray-700'
@@ -125,7 +122,6 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
           </button>
         </div>
 
-        {/* Amount */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Amount *
@@ -136,7 +132,8 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
             value={formData.amount}
             onChange={handleChange}
             step="0.01"
-            className={` ${
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 
+              focus:ring-blue-500 focus:border-transparent ${
               errors.amount ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="0.00"
@@ -146,17 +143,17 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
           )}
         </div>
 
-        {/* Category */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Category *
           </label>
           <select
             name="category"
-            
-            className={`
-               ${
-               'border-gray-300'
+            value={formData.category}
+            onChange={handleChange}
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 
+              focus:ring-blue-500 focus:border-transparent ${
+              errors.category ? 'border-red-500' : 'border-gray-300'
             }`}
           >
             <option value="">Select category</option>
@@ -164,11 +161,11 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
               <option key={cat.name} value={cat.name}>{cat.name}</option>
             ))}
           </select>
-          
-          
+          {errors.category && (
+            <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+          )}
         </div>
 
-        {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Description (Optional)
@@ -176,12 +173,14 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
           <input
             type="text"
             name="description"
-            
+            value={formData.description}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+              focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="e.g., Grocery shopping"
           />
         </div>
 
-        {/* Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Date *
@@ -190,18 +189,22 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
             type="date"
             name="date"
             value={formData.date}
-            
+            onChange={handleChange}
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 
+              focus:ring-blue-500 focus:border-transparent ${
+              errors.date ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
           {errors.date && (
             <p className="text-red-500 text-sm mt-1">{errors.date}</p>
           )}
         </div>
 
-        {/* Submit Button */}
         <div className="flex gap-2">
           <button
             type="submit"
-           
+            className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg 
+              hover:bg-blue-600 transition-colors font-medium"
           >
             {editingTransaction ? 'Update' : 'Add'} Transaction
           </button>

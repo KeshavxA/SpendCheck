@@ -15,7 +15,6 @@ export const useFinance = () => {
 export const FinanceProvider = ({ children }) => {
   const [state, dispatch] = useReducer(financeReducer, initialState);
 
-  // Load data on mount
   useEffect(() => {
     const savedTransactions = loadTransactions();
     if (savedTransactions.length > 0) {
@@ -23,7 +22,6 @@ export const FinanceProvider = ({ children }) => {
     }
   }, []);
 
-  // Save data whenever transactions change
   useEffect(() => {
     if (state.transactions.length > 0 || localStorage.getItem('spendcheck_data')) {
       saveTransactions(state.transactions);

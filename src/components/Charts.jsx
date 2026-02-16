@@ -8,8 +8,7 @@ const Charts = () => {
   const monthlyTransactions = getMonthlyTransactions(transactions);
   
   const categoryData = getCategoryBreakdown(transactions);
-  
-  // Get colors for categories
+
   const dataWithColors = categoryData.map(item => {
     const category = EXPENSE_CATEGORIES.find(cat => cat.name === item.name);
     return {
@@ -18,7 +17,6 @@ const Charts = () => {
     };
   });
 
-  // Income vs Expense data
   const incomeVsExpense = [
     {
       name: 'Income',
@@ -42,7 +40,6 @@ const Charts = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Category Breakdown Chart */}
       {categoryData.length > 0 && (
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-xl font-bold mb-4">Spending by Category</h3>
@@ -69,7 +66,6 @@ const Charts = () => {
         </div>
       )}
 
-      {/* Income vs Expense Chart */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-xl font-bold mb-4">Income vs Expenses (This Month)</h3>
         <ResponsiveContainer width="100%" height={300}>
