@@ -1,8 +1,10 @@
 import { format } from 'date-fns';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, Repeat, Sparkles } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency } from '../utils/calculations';
 import { TRANSACTION_TYPES } from '../constants/categories';
+import { getFrequencyLabel } from '../utils/recurringExpenses';
+
 
 const TransactionList = ({ onEditTransaction }) => {
   const { transactions, deleteTransaction } = useFinance();
@@ -27,7 +29,7 @@ const TransactionList = ({ onEditTransaction }) => {
       <div className="p-6 border-b border-gray-200">
         <h2 className="text-2xl font-bold">Recent Transactions</h2>
       </div>
-      
+
       <div className="divide-y divide-gray-200">
         {transactions.map((transaction) => (
           <div
@@ -38,16 +40,29 @@ const TransactionList = ({ onEditTransaction }) => {
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-2 h-2 rounded-full ${
-                      transaction.type === TRANSACTION_TYPES.INCOME
-                        ? 'bg-green-500'
-                        : 'bg-red-500'
-                    }`}
+                    className={`w-2 h-2 rounded-full ${transaction.type === TRANSACTION_TYPES.INCOME
+                      ? 'bg-green-500'
+                      : 'bg-red-500'
+                      }`}
                   />
                   <div>
-                    <p className="font-semibold text-gray-900">
-                      {transaction.category}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-gray-900">
+                        {transaction.category}
+                      </p>
+                      {transaction.isRecurring && !transaction.isRecurringInstance && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                          <Repeat className="w-3 h-3" />
+                          {getFrequencyLabel(transaction.recurringFrequency)}
+                        </span>
+                      )}
+                      {transaction.isRecurringInstance && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                          <Sparkles className="w-3 h-3" />
+                          Auto
+                        </span>
+                      )}
+                    </div>
                     {transaction.description && (
                       <p className="text-sm text-gray-600">
                         {transaction.description}
@@ -62,11 +77,10 @@ const TransactionList = ({ onEditTransaction }) => {
 
               <div className="flex items-center gap-4">
                 <p
-                  className={`text-xl font-bold ${
-                    transaction.type === TRANSACTION_TYPES.INCOME
-                      ? 'text-green-600'
-                      : 'text-red-600'
-                  }`}
+                  className={`text-xl font-bold ${transaction.type === TRANSACTION_TYPES.INCOME
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                    }`}
                 >
                   {transaction.type === TRANSACTION_TYPES.INCOME ? '+' : '-'}
                   {formatCurrency(transaction.amount)}
