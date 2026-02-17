@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import { financeReducer, initialState, ACTIONS } from '../reducers/financeReducer';
 import { saveTransactions, loadTransactions, clearStorage } from '../utils/storage';
+import { processRecurringTransactions, updateRecurringTransactions } from '../utils/recurringExpenses';
 
 const FinanceContext = createContext();
 
@@ -26,6 +27,39 @@ export const FinanceProvider = ({ children }) => {
     if (state.transactions.length > 0 || localStorage.getItem('spendcheck_data')) {
       saveTransactions(state.transactions);
     }
+  }, [state.transactions]);
+
+  // Process recurring transactions daily
+  useEffect(() => {
+    const processRecurring = () => {
+      const newTransactions = processRecurringTransactions(state.transactions);
+
+      if (newTransactions.length > 0) {
+        // Add new recurring instances
+        newTransactions.forEach(transaction => {
+          dispatch({ type: ACTIONS.ADD_TRANSACTION, payload: transaction });
+        });
+
+        // Update lastProcessedDate for parent recurring transactions
+        const processedIds = newTransactions.map(t => t.parentRecurringId);
+        const updatedTransactions = updateRecurringTransactions(
+          state.transactions,
+          [...new Set(processedIds)]
+        );
+
+        dispatch({ type: ACTIONS.LOAD_TRANSACTIONS, payload: updatedTransactions });
+      }
+    };
+
+    // Process on load
+    if (state.transactions.length > 0) {
+      processRecurring();
+    }
+
+    // Check daily (every 24 hours)
+    const interval = setInterval(processRecurring, 24 * 60 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, [state.transactions]);
 
   const addTransaction = (transaction) => {

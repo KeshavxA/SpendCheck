@@ -5,6 +5,8 @@ import StatsCards from './StatsCards';
 import TransactionForm from './TransactionForm';
 import TransactionList from './TransactionList';
 import Charts from './Charts';
+import AIInsights from './AIInsights';
+
 
 const Dashboard = () => {
   const { clearAll } = useFinance();
@@ -33,7 +35,7 @@ const Dashboard = () => {
                 <p className="text-sm text-gray-600">Track your finances with ease</p>
               </div>
             </div>
-            
+
             <button
               onClick={clearAll}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 
@@ -47,7 +49,10 @@ const Dashboard = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <StatsCards />
-        <TransactionForm 
+
+        <AIInsights />
+
+        <TransactionForm
           editingTransaction={editingTransaction}
           onCancelEdit={handleCancelEdit}
         />
