@@ -8,9 +8,6 @@ export const RECURRING_FREQUENCIES = {
     YEARLY: 'yearly'
 };
 
-/**
- * Calculate the next occurrence date for a recurring transaction
- */
 export const getNextOccurrence = (lastDate, frequency) => {
     const date = new Date(lastDate);
 

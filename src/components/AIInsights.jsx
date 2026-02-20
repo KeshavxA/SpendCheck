@@ -32,10 +32,9 @@ const AIInsights = () => {
     };
 
     useEffect(() => {
-        // Auto-fetch insights when transactions change
         const timer = setTimeout(() => {
             fetchInsights();
-        }, 500); // Debounce to avoid too many API calls
+        }, 500);
 
         return () => clearTimeout(timer);
     }, [transactions]);

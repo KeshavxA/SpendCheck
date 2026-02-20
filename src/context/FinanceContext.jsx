@@ -29,18 +29,17 @@ export const FinanceProvider = ({ children }) => {
     }
   }, [state.transactions]);
 
-  // Process recurring transactions daily
+ 
   useEffect(() => {
     const processRecurring = () => {
       const newTransactions = processRecurringTransactions(state.transactions);
 
       if (newTransactions.length > 0) {
-        // Add new recurring instances
+    
         newTransactions.forEach(transaction => {
           dispatch({ type: ACTIONS.ADD_TRANSACTION, payload: transaction });
         });
 
-        // Update lastProcessedDate for parent recurring transactions
         const processedIds = newTransactions.map(t => t.parentRecurringId);
         const updatedTransactions = updateRecurringTransactions(
           state.transactions,
@@ -51,12 +50,11 @@ export const FinanceProvider = ({ children }) => {
       }
     };
 
-    // Process on load
+
     if (state.transactions.length > 0) {
       processRecurring();
     }
 
-    // Check daily (every 24 hours)
     const interval = setInterval(processRecurring, 24 * 60 * 60 * 1000);
 
     return () => clearInterval(interval);

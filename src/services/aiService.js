@@ -2,7 +2,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TRANSACTION_TYPES } from '../constants/categories';
 import { startOfMonth, endOfMonth, subMonths, isWithinInterval, format } from 'date-fns';
 
-// Initialize Gemini AI
 const getAIClient = () => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
@@ -12,9 +11,7 @@ const getAIClient = () => {
     return new GoogleGenerativeAI(apiKey);
 };
 
-/**
- * Get transactions for a specific month
- */
+
 const getTransactionsForMonth = (transactions, monthsAgo = 0) => {
     const targetDate = subMonths(new Date(), monthsAgo);
     const start = startOfMonth(targetDate);
@@ -26,9 +23,7 @@ const getTransactionsForMonth = (transactions, monthsAgo = 0) => {
     });
 };
 
-/**
- * Calculate spending by category for a month
- */
+
 const getCategorySpending = (transactions) => {
     const expenses = transactions.filter(t => t.type === TRANSACTION_TYPES.EXPENSE);
     const categoryTotals = {};
@@ -43,18 +38,14 @@ const getCategorySpending = (transactions) => {
     return categoryTotals;
 };
 
-/**
- * Calculate total for a transaction type
- */
+
 const calculateTotal = (transactions, type) => {
     return transactions
         .filter(t => t.type === type)
         .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 };
 
-/**
- * Generate spending analysis data
- */
+
 export const analyzeSpending = (transactions) => {
     const currentMonthTransactions = getTransactionsForMonth(transactions, 0);
     const lastMonthTransactions = getTransactionsForMonth(transactions, 1);
@@ -68,7 +59,6 @@ export const analyzeSpending = (transactions) => {
     const currentCategorySpending = getCategorySpending(currentMonthTransactions);
     const lastCategorySpending = getCategorySpending(lastMonthTransactions);
 
-    // Calculate percentage changes
     const expenseChange = lastMonthExpenses > 0
         ? ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
         : 0;
@@ -77,7 +67,6 @@ export const analyzeSpending = (transactions) => {
         ? ((currentMonthIncome - lastMonthIncome) / lastMonthIncome) * 100
         : 0;
 
-    // Find biggest spending increases
     const categoryChanges = Object.keys(currentCategorySpending).map(category => {
         const current = currentCategorySpending[category] || 0;
         const last = lastCategorySpending[category] || 0;
@@ -116,9 +105,7 @@ export const analyzeSpending = (transactions) => {
     };
 };
 
-/**
- * Generate AI-powered insights using Gemini
- */
+
 export const generateAIInsights = async (transactions) => {
     try {
         const genAI = getAIClient();

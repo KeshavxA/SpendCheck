@@ -37,7 +37,7 @@ const Charts = () => {
     }
   ];
 
-  // Generate spending trends over last 6 months
+
   const getSpendingTrends = () => {
     const trends = [];
     for (let i = 5; i >= 0; i--) {
@@ -65,7 +65,6 @@ const Charts = () => {
 
   const spendingTrends = getSpendingTrends();
 
-  // Get top 5 spending categories for comparison
   const getTopCategoriesComparison = () => {
     const currentMonth = getMonthlyTransactions(transactions);
     const lastMonth = transactions.filter(t => {
@@ -146,7 +145,6 @@ const Charts = () => {
 
   return (
     <div className="space-y-6">
-      {/* Spending Trends Over Time */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-xl font-bold mb-4 text-gray-900">Spending Trends (Last 6 Months)</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -186,7 +184,6 @@ const Charts = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Category Comparison: This Month vs Last Month */}
       {categoryComparison.length > 0 && (
         <div className="bg-white rounded-lg shadow-md p-6">
           <h3 className="text-xl font-bold mb-4 text-gray-900">Category Comparison (This Month vs Last Month)</h3>
@@ -203,8 +200,7 @@ const Charts = () => {
           </ResponsiveContainer>
         </div>
       )}
-
-      {/* Existing Charts */}
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {categoryData.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6">
