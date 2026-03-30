@@ -29,13 +29,13 @@ export const FinanceProvider = ({ children }) => {
     }
   }, [state.transactions]);
 
- 
+
   useEffect(() => {
     const processRecurring = () => {
       const newTransactions = processRecurringTransactions(state.transactions);
 
       if (newTransactions.length > 0) {
-    
+
         newTransactions.forEach(transaction => {
           dispatch({ type: ACTIONS.ADD_TRANSACTION, payload: transaction });
         });

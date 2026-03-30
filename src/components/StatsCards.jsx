@@ -59,7 +59,7 @@ const StatsCards = () => {
                   {stat.value}
                 </p>
               </div>
-              {/* Dynamic background for icons that works in both modes */}
+              
               <div className={`${stat.bgColor} p-3 rounded-full transition-colors duration-300`}>
                 <Icon className={`w-6 h-6 ${stat.color}`} />
               </div>
