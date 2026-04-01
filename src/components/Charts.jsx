@@ -100,9 +100,9 @@ const Charts = () => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded shadow-lg">
-          <p className="font-semibold">{payload[0].name}</p>
-          <p className="text-blue-600">
+        <div className="bg-white dark:bg-slate-800 p-3 border border-gray-200 dark:border-slate-700 rounded shadow-lg">
+          <p className="font-semibold text-gray-900 dark:text-white">{payload[0].name}</p>
+          <p className="text-blue-600 dark:text-blue-400">
             ₹{payload[0].value.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
           </p>
         </div>
@@ -114,10 +114,10 @@ const Charts = () => {
   const MultiLineTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded shadow-lg">
-          <p className="font-semibold mb-2">{label}</p>
+        <div className="bg-white dark:bg-slate-800 p-3 border border-gray-200 dark:border-slate-700 rounded shadow-lg">
+          <p className="font-semibold mb-2 text-gray-900 dark:text-white">{label}</p>
           {payload.map((entry, index) => (
-            <p key={index} style={{ color: entry.color }} className="text-sm">
+            <p key={index} style={{ color: entry.color }} className="text-sm font-medium">
               {entry.name}: ₹{entry.value.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
             </p>
           ))}
@@ -129,24 +129,25 @@ const Charts = () => {
 
   if (transactions.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-gray-500">Add transactions to see visual insights</p>
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-8 text-center">
+        <p className="text-gray-500 dark:text-gray-400">Add transactions to see visual insights</p>
       </div>
     );
   }
 
   if (!isMounted) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-gray-500">Loading charts...</p>
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-8 text-center flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="ml-3 text-gray-500 dark:text-gray-400 font-medium">Analytics loading...</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-xl font-bold mb-4 text-gray-900">Spending Trends (Last 6 Months)</h3>
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-6">
+        <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Spending Trends</h3>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={spendingTrends}>
             <defs>
@@ -159,15 +160,28 @@ const Charts = () => {
                 <stop offset="95%" stopColor="#FF6384" stopOpacity={0.1} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="month" stroke="#666" />
-            <YAxis stroke="#666" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
+            <XAxis
+              dataKey="month"
+              stroke="#94a3b8"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="#94a3b8"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value}`}
+            />
             <Tooltip content={<MultiLineTooltip />} />
-            <Legend />
+            <Legend verticalAlign="top" height={36} />
             <Area
               type="monotone"
               dataKey="income"
               stroke="#4CAF50"
+              strokeWidth={3}
               fillOpacity={1}
               fill="url(#colorIncome)"
               name="Income"
@@ -176,6 +190,7 @@ const Charts = () => {
               type="monotone"
               dataKey="expenses"
               stroke="#FF6384"
+              strokeWidth={3}
               fillOpacity={1}
               fill="url(#colorExpenses)"
               name="Expenses"
@@ -185,36 +200,35 @@ const Charts = () => {
       </div>
 
       {categoryComparison.length > 0 && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-bold mb-4 text-gray-900">Category Comparison (This Month vs Last Month)</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-6">
+          <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Category Comparison</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={categoryComparison}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="category" stroke="#666" />
-              <YAxis stroke="#666" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
+              <XAxis dataKey="category" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
+              <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
               <Tooltip content={<MultiLineTooltip />} />
-              <Legend />
-              <Bar dataKey="This Month" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="Last Month" fill="#d8b4fe" radius={[8, 8, 0, 0]} />
+              <Legend verticalAlign="top" height={36} />
+              <Bar dataKey="This Month" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Last Month" fill="#d8b4fe" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {categoryData.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Spending by Category</h3>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-6">
+            <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Category Mix</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={dataWithColors}
                   cx="50%"
                   cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  innerRadius={60}
                   outerRadius={80}
-                  fill="#8884d8"
+                  paddingAngle={5}
                   dataKey="value"
                 >
                   {dataWithColors.map((entry, index) => (
@@ -228,15 +242,15 @@ const Charts = () => {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-bold mb-4 text-gray-900">Income vs Expenses (This Month)</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-6">
+          <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Monthly Balance</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={incomeVsExpense}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="name" stroke="#666" />
-              <YAxis stroke="#666" />
+            <BarChart data={incomeVsExpense} layout="vertical" margin={{ left: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} vertical={true} horizontal={false} />
+              <XAxis type="number" stroke="#94a3b8" fontSize={12} hide />
+              <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="amount" fill="#8884d8" radius={[8, 8, 0, 0]}>
+              <Bar dataKey="amount" fill="#8884d8" radius={[0, 4, 4, 0]} barSize={40}>
                 {incomeVsExpense.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}

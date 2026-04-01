@@ -4,11 +4,15 @@ export const ACTIONS = {
   DELETE_TRANSACTION: 'DELETE_TRANSACTION',
   LOAD_TRANSACTIONS: 'LOAD_TRANSACTIONS',
   CLEAR_ALL: 'CLEAR_ALL',
-  PROCESS_RECURRING: 'PROCESS_RECURRING'
+  PROCESS_RECURRING: 'PROCESS_RECURRING',
+  UPSERT_BUDGET: 'UPSERT_BUDGET',
+  DELETE_BUDGET: 'DELETE_BUDGET',
+  LOAD_BUDGETS: 'LOAD_BUDGETS'
 };
 
 export const initialState = {
-  transactions: []
+  transactions: [],
+  budgets: []
 };
 
 export function financeReducer(state, action) {
@@ -41,6 +45,31 @@ export function financeReducer(state, action) {
 
     case ACTIONS.CLEAR_ALL:
       return initialState;
+
+    case ACTIONS.UPSERT_BUDGET: {
+      const existingIdx = state.budgets.findIndex(b => b.category === action.payload.category);
+      if (existingIdx >= 0) {
+        const newBudgets = [...state.budgets];
+        newBudgets[existingIdx] = { ...newBudgets[existingIdx], limit: parseFloat(action.payload.limit) };
+        return { ...state, budgets: newBudgets };
+      }
+      return {
+        ...state,
+        budgets: [...state.budgets, { ...action.payload, limit: parseFloat(action.payload.limit) }]
+      };
+    }
+
+    case ACTIONS.DELETE_BUDGET:
+      return {
+        ...state,
+        budgets: state.budgets.filter(b => b.category !== action.payload)
+      };
+
+    case ACTIONS.LOAD_BUDGETS:
+      return {
+        ...state,
+        budgets: action.payload
+      };
 
     default:
       return state;

@@ -1,6 +1,12 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import { financeReducer, initialState, ACTIONS } from '../reducers/financeReducer';
-import { saveTransactions, loadTransactions, clearStorage } from '../utils/storage';
+import {
+  saveTransactions,
+  loadTransactions,
+  saveBudgets,
+  loadBudgets,
+  clearStorage
+} from '../utils/storage';
 import { processRecurringTransactions, updateRecurringTransactions } from '../utils/recurringExpenses';
 
 const FinanceContext = createContext();
@@ -16,26 +22,41 @@ export const useFinance = () => {
 export const FinanceProvider = ({ children }) => {
   const [state, dispatch] = useReducer(financeReducer, initialState);
 
+  // Load initial data
   useEffect(() => {
     const savedTransactions = loadTransactions();
     if (savedTransactions.length > 0) {
       dispatch({ type: ACTIONS.LOAD_TRANSACTIONS, payload: savedTransactions });
     }
+
+    const savedBudgets = loadBudgets();
+    if (savedBudgets.length > 0) {
+      dispatch({ type: ACTIONS.LOAD_BUDGETS, payload: savedBudgets });
+    }
   }, []);
 
+  // Save changes
   useEffect(() => {
     if (state.transactions.length > 0 || localStorage.getItem('spendcheck_data')) {
       saveTransactions(state.transactions);
     }
   }, [state.transactions]);
 
+  useEffect(() => {
+    if (state.budgets.length > 0 || localStorage.getItem('spendcheck_budgets')) {
+      saveBudgets(state.budgets);
+    }
+  }, [state.budgets]);
 
+
+  // Handle recurring transactions
   useEffect(() => {
     const processRecurring = () => {
+      if (state.transactions.length === 0) return;
+
       const newTransactions = processRecurringTransactions(state.transactions);
 
       if (newTransactions.length > 0) {
-
         newTransactions.forEach(transaction => {
           dispatch({ type: ACTIONS.ADD_TRANSACTION, payload: transaction });
         });
@@ -72,8 +93,16 @@ export const FinanceProvider = ({ children }) => {
     dispatch({ type: ACTIONS.DELETE_TRANSACTION, payload: id });
   };
 
+  const upsertBudget = (budget) => {
+    dispatch({ type: ACTIONS.UPSERT_BUDGET, payload: budget });
+  };
+
+  const deleteBudget = (category) => {
+    dispatch({ type: ACTIONS.DELETE_BUDGET, payload: category });
+  };
+
   const clearAll = () => {
-    if (window.confirm('Are you sure? This will delete all transactions.')) {
+    if (window.confirm('Are you sure? This will delete all transactions and budgets.')) {
       clearStorage();
       dispatch({ type: ACTIONS.CLEAR_ALL });
     }
@@ -81,9 +110,12 @@ export const FinanceProvider = ({ children }) => {
 
   const value = {
     transactions: state.transactions,
+    budgets: state.budgets,
     addTransaction,
     editTransaction,
     deleteTransaction,
+    upsertBudget,
+    deleteBudget,
     clearAll
   };
 
