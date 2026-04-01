@@ -1,11 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { TRANSACTION_TYPES } from '../constants/categories';
+import { TRANSACTION_TYPES, EXPENSE_CATEGORIES } from '../constants/categories';
 import { startOfMonth, endOfMonth, subMonths, isWithinInterval, format } from 'date-fns';
 
 const getAIClient = () => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
-        console.warn('Gemini API key not found. AI insights will be disabled.');
+        console.warn('Gemini API key not found. AI features will be limited.');
         return null;
     }
     return new GoogleGenerativeAI(apiKey);
@@ -114,7 +114,7 @@ export const generateAIInsights = async (transactions) => {
         }
 
         const analysis = analyzeSpending(transactions);
-        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
         const prompt = `You are a personal finance advisor. Analyze this spending data and provide 3-4 concise, actionable insights in a friendly tone. Use Indian Rupee (₹) format.
 
@@ -164,6 +164,65 @@ Return ONLY the JSON array, no other text.`;
     } catch (error) {
         console.error('Error generating AI insights:', error);
         return getFallbackInsights(transactions);
+    }
+};
+
+/**
+ * Scans a receipt image and extracts transaction details
+ * @param {File} imageFile 
+ * @returns {Promise<Object>} Extracted transaction info
+ */
+export const scanReceipt = async (imageFile) => {
+    try {
+        const genAI = getAIClient();
+        if (!genAI) throw new Error('AI Client not initialized');
+
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        // Convert file to base64
+        const base64Data = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(imageFile);
+        });
+
+        const prompt = `Analyze this receipt image and extract the following information in JSON format:
+        - amount: Total amount (number only)
+        - date: Date of transaction in YYYY-MM-DD format (if not found, use current date ${format(new Date(), 'yyyy-MM-dd')})
+        - storeName: Name of the merchant or store
+        - category: One of these categories: ${EXPENSE_CATEGORIES.map(c => c.name).join(', ')}
+        - description: A brief summary of items bought
+
+        Return ONLY the JSON object. Example:
+        {
+          "amount": 1250.50,
+          "date": "2024-03-25",
+          "storeName": "Starbucks",
+          "category": "Food & Dining",
+          "description": "Coffee and sandwich"
+        }`;
+
+        const result = await model.generateContent([
+            prompt,
+            {
+                inlineData: {
+                    data: base64Data,
+                    mimeType: imageFile.type
+                }
+            }
+        ]);
+
+        const response = await result.response;
+        const text = response.text();
+
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+        throw new Error('Could not extract data from receipt');
+    } catch (error) {
+        console.error('Error scanning receipt:', error);
+        throw error;
     }
 };
 
