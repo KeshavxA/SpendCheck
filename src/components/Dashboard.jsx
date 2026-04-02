@@ -11,6 +11,7 @@ import AIInsights from './AIInsights';
 import BudgetProgress from './BudgetProgress';
 import BudgetForm from './BudgetForm';
 import HealthScore from './HealthScore';
+import ExportReports from './ExportReports';
 
 const Dashboard = () => {
   const { clearAll } = useFinance();
@@ -47,7 +48,7 @@ const Dashboard = () => {
               <button
                 onClick={clearAll}
                 className="px-3 sm:px-4 py-2 bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500 hover:text-white 
-                  transition-all font-medium text-sm sm:text-base"
+                  transition-all font-medium text-sm sm:text-base font-bold"
               >
                 Reset App
               </button>
@@ -69,19 +70,24 @@ const Dashboard = () => {
           <div className="lg:col-span-4 space-y-6">
             <BudgetProgress />
             <BudgetForm />
+            <ExportReports />
           </div>
         </div>
 
         {/* Action Section: Transactions & Analysis */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-12 xl:col-span-5">
-            <TransactionForm
-              editingTransaction={editingTransaction}
-              onCancelEdit={handleCancelEdit}
-            />
-          </div>
-          <div className="lg:col-span-12 xl:col-span-7">
-            <Charts />
+          <div className="lg:col-span-12 xl:col-span-12">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+              <div className="xl:col-span-5">
+                <TransactionForm
+                  editingTransaction={editingTransaction}
+                  onCancelEdit={handleCancelEdit}
+                />
+              </div>
+              <div className="xl:col-span-7">
+                <Charts />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -94,7 +100,7 @@ const Dashboard = () => {
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="border-t border-gray-200 dark:border-slate-700 py-8">
           <p className="text-center text-gray-500 dark:text-gray-400 text-sm">
-            © 2024 SpendCheck • Crafted by <span className="font-semibold text-blue-500">Keshav Sharma</span>
+            © 2024 SpendCheck • Crafted by <span className="font-semibold text-blue-500 font-bold">Keshav Sharma</span>
           </p>
         </div>
       </footer>
