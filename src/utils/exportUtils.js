@@ -2,9 +2,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { format } from 'date-fns';
 
-/**
- * Generates a CSV from transactions and triggers a download
- */
+
 export const exportToCSV = (transactions) => {
     if (!transactions.length) return;
 
@@ -33,9 +31,7 @@ export const exportToCSV = (transactions) => {
     document.body.removeChild(link);
 };
 
-/**
- * Generates a professional PDF report and triggers a download
- */
+
 export const exportToPDF = (transactions, budgets, healthScore) => {
     if (!transactions.length) return;
 
@@ -43,9 +39,9 @@ export const exportToPDF = (transactions, budgets, healthScore) => {
     const now = new Date();
     const dateStr = format(now, 'MMMM yyyy');
 
-    // Header
+
     doc.setFontSize(22);
-    doc.setTextColor(59, 130, 246); // Blue-500
+    doc.setTextColor(59, 130, 246); 
     doc.text('SpendCheck Financial Report', 14, 20);
 
     doc.setFontSize(10);
@@ -53,7 +49,6 @@ export const exportToPDF = (transactions, budgets, healthScore) => {
     doc.text(`Generated on: ${format(now, 'dd-MM-yyyy HH:mm')}`, 14, 28);
     doc.text(`Period: ${dateStr}`, 14, 33);
 
-    // Summary Section
     const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
     const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
     const balance = income - expenses;
@@ -75,7 +70,6 @@ export const exportToPDF = (transactions, budgets, healthScore) => {
         headStyles: { fillStyle: 'fill', fillColor: [59, 130, 246] }
     });
 
-    // Transactions Table
     doc.setFontSize(14);
     doc.text('Recent Transactions', 14, doc.lastAutoTable.finalY + 15);
 
@@ -89,10 +83,9 @@ export const exportToPDF = (transactions, budgets, healthScore) => {
             t.description || '-',
             t.amount.toFixed(2)
         ]),
-        headStyles: { fillColor: [71, 85, 105] } // Slate-600
+        headStyles: { fillColor: [71, 85, 105] } 
     });
 
-    // Budget Adherence if budgets exist
     if (budgets && budgets.length > 0) {
         doc.addPage();
         doc.text('Budget Analysis', 14, 20);
@@ -109,11 +102,9 @@ export const exportToPDF = (transactions, budgets, healthScore) => {
             startY: 25,
             head: [['Category', 'Limit (INR)', 'Spent (INR)', 'Adherence']],
             body: budgetBody,
-            headStyles: { fillColor: [139, 92, 246] } // Purple-500
+            headStyles: { fillColor: [139, 92, 246] } 
         });
     }
-
-    // Footer
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);

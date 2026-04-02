@@ -1,9 +1,7 @@
 import { TRANSACTION_TYPES } from '../constants/categories';
 import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
-/**
- * Calculates a financial health score from 1 to 100
- */
+
 export const calculateFinancialHealthScore = (transactions, budgets) => {
     const now = new Date();
     const currentMonth = { start: startOfMonth(now), end: endOfMonth(now) };
@@ -23,16 +21,13 @@ export const calculateFinancialHealthScore = (transactions, budgets) => {
 
     let score = 0;
 
-    // 1. Savings Rate (Max 40 points)
-    // Goal: 20% or more savings
+  
     if (income > 0) {
         const savingsRate = (income - expenses) / income;
-        const savingsScore = Math.max(0, Math.min(40, savingsRate * 200)); // 0.2 * 200 = 40
+        const savingsScore = Math.max(0, Math.min(40, savingsRate * 200)); 
         score += savingsScore;
     }
 
-    // 2. Budget Adherence (Max 40 points)
-    // Percentage of categories that are within their set budget
     if (budgets.length > 0) {
         let withinBudgetCount = 0;
         budgets.forEach(budget => {
@@ -47,21 +42,18 @@ export const calculateFinancialHealthScore = (transactions, budgets) => {
         const budgetAccuracy = withinBudgetCount / budgets.length;
         score += (budgetAccuracy * 40);
     } else {
-        // If no budgets are set, we give a neutral score (20 pts) to encourage setting them
+       
         score += 20;
     }
 
-    // 3. Income-to-Expense Ratio (Max 20 points)
-    // Healthy if expenses are significantly lower than income
     if (income > 0) {
         const ratio = expenses / income;
         if (ratio <= 0.5) score += 20;
         else if (ratio <= 0.8) score += 15;
         else if (ratio <= 1.0) score += 5;
-        // if > 1.0, score is 0
+ 
     }
 
-    // Edge case: No data
     if (monthTransactions.length === 0) return 0;
 
     return Math.round(score);

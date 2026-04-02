@@ -95,7 +95,6 @@ const ExportReports = () => {
                 <span>v1.2 Report Engine</span>
             </div>
 
-            {/* Background elements */}
             <div className="absolute -top-6 -left-6 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
         </div>
     );

@@ -8,7 +8,6 @@ const HealthScore = () => {
     const score = calculateFinancialHealthScore(transactions, budgets);
     const label = getHealthLabel(score);
 
-    // Data for the gauge: [score, remaining]
     const data = [
         { value: score, color: label.bg.replace('bg-', '') },
         { value: 100 - score, color: 'transparent' }
@@ -29,7 +28,7 @@ const HealthScore = () => {
             </div>
 
             <div className="flex items-center gap-6">
-                {/* Gauge Section */}
+   
                 <div className="relative w-32 h-32 flex-shrink-0">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -60,7 +59,6 @@ const HealthScore = () => {
                     </div>
                 </div>
 
-                {/* Score Breakdown / Tip Section */}
                 <div className="space-y-3 flex-1 overflow-hidden">
                     <div>
                         <p className="text-sm font-bold text-gray-800 dark:text-white truncate">
@@ -92,7 +90,7 @@ const HealthScore = () => {
                 </div>
             </div>
 
-            {/* Background elements for premium feel */}
+          
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
         </div>
     );

@@ -22,7 +22,6 @@ export const useFinance = () => {
 export const FinanceProvider = ({ children }) => {
   const [state, dispatch] = useReducer(financeReducer, initialState);
 
-  // Load initial data
   useEffect(() => {
     const savedTransactions = loadTransactions();
     if (savedTransactions.length > 0) {
@@ -35,7 +34,6 @@ export const FinanceProvider = ({ children }) => {
     }
   }, []);
 
-  // Save changes
   useEffect(() => {
     if (state.transactions.length > 0 || localStorage.getItem('spendcheck_data')) {
       saveTransactions(state.transactions);
@@ -49,7 +47,6 @@ export const FinanceProvider = ({ children }) => {
   }, [state.budgets]);
 
 
-  // Handle recurring transactions
   useEffect(() => {
     const processRecurring = () => {
       if (state.transactions.length === 0) return;

@@ -12,7 +12,6 @@ const ReceiptScanner = ({ onScanComplete }) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Basic validation
         if (!file.type.startsWith('image/')) {
             setError('Please upload an image of a receipt.');
             return;
@@ -29,7 +28,7 @@ const ReceiptScanner = ({ onScanComplete }) => {
             setSuccess(true);
             onScanComplete(data);
 
-            // Auto-hide success after 3s
+          
             setTimeout(() => setSuccess(false), 3000);
         } catch (err) {
             setError('Failed to scan receipt. Please try again.');

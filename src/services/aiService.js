@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TRANSACTION_TYPES, EXPENSE_CATEGORIES } from '../constants/categories';
-import { startOfMonth, endOfMonth, subMonths, isWithinInterval, format } from 'date-fns';
+import { startOfMonth, endOfMonth, subMonths, isWithinInterval } from 'date-fns';
 
 const getAIClient = () => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -167,11 +167,7 @@ Return ONLY the JSON array, no other text.`;
     }
 };
 
-/**
- * Scans a receipt image and extracts transaction details
- * @param {File} imageFile 
- * @returns {Promise<Object>} Extracted transaction info
- */
+
 export const scanReceipt = async (imageFile) => {
     try {
         const genAI = getAIClient();
@@ -179,7 +175,6 @@ export const scanReceipt = async (imageFile) => {
 
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-        // Convert file to base64
         const base64Data = await new Promise((resolve) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result.split(',')[1]);
@@ -188,19 +183,12 @@ export const scanReceipt = async (imageFile) => {
 
         const prompt = `Analyze this receipt image and extract the following information in JSON format:
         - amount: Total amount (number only)
-        - date: Date of transaction in YYYY-MM-DD format (if not found, use current date ${format(new Date(), 'yyyy-MM-dd')})
+        - date: Date of transaction in YYYY-MM-DD format
         - storeName: Name of the merchant or store
         - category: One of these categories: ${EXPENSE_CATEGORIES.map(c => c.name).join(', ')}
         - description: A brief summary of items bought
 
-        Return ONLY the JSON object. Example:
-        {
-          "amount": 1250.50,
-          "date": "2024-03-25",
-          "storeName": "Starbucks",
-          "category": "Food & Dining",
-          "description": "Coffee and sandwich"
-        }`;
+        Return ONLY the JSON object.`;
 
         const result = await model.generateContent([
             prompt,
@@ -227,6 +215,48 @@ export const scanReceipt = async (imageFile) => {
 };
 
 
+export const predictAffordability = async (item, amount, transactions, budgets) => {
+    try {
+        const genAI = getAIClient();
+        if (!genAI) throw new Error('AI Client not initialized');
+
+        const analysis = analyzeSpending(transactions);
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        const prompt = `You are a savvy personal finance AI. A user wants to buy "${item}" for ₹${amount}. 
+        Analyze their financial situation and tell them if they can afford it now or what they need to do.
+
+        Context:
+        - Monthly Income: ₹${analysis.currentMonth.income}
+        - Monthly Expenses: ₹${analysis.currentMonth.expenses}
+        - Current Balance (this month): ₹${analysis.currentMonth.balance}
+        - Top Spending Categories: ${JSON.stringify(analysis.currentMonth.categorySpending)}
+        - Budgets Set: ${JSON.stringify(budgets)}
+
+        Return a JSON object with:
+        - canAfford: boolean
+        - verdict: A short punchy verdict (e.g. "Go for it!", "Wait a bit", "Think twice")
+        - analysis: A 2-sentence explanation of why.
+        - recommendation: A specific saving tip or cutback required (e.g. "Cut dining out by 20% for 2 months").
+
+        Return ONLY the JSON object. Use Indian Rupees (₹).`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+        throw new Error('Failed to generate affordability prediction');
+    } catch (error) {
+        console.error('Error predicting affordability:', error);
+        throw error;
+    }
+};
+
+
 const getFallbackInsights = (transactions) => {
     const analysis = analyzeSpending(transactions);
     const insights = [];
@@ -235,42 +265,21 @@ const getFallbackInsights = (transactions) => {
         const direction = analysis.changes.expenseChange > 0 ? 'more' : 'less';
         const amount = Math.abs(analysis.currentMonth.expenses - analysis.lastMonth.expenses);
         insights.push(
-            `You spent ${Math.abs(analysis.changes.expenseChange).toFixed(0)}% ${direction} this month (₹${amount.toFixed(0)} ${direction}). ${analysis.changes.expenseChange > 0
-                ? `Try to reduce spending by ₹${(amount * 0.3).toFixed(0)} next month.`
-                : 'Great job keeping expenses down!'
-            }`
+            `You spent ${Math.abs(analysis.changes.expenseChange).toFixed(0)}% ${direction} this month (₹${amount.toFixed(0)} ${direction}).`
         );
     }
 
     if (analysis.changes.categoryChanges.length > 0) {
         const topChange = analysis.changes.categoryChanges[0];
-        if (Math.abs(topChange.change) > 10) {
-            insights.push(
-                `Your ${topChange.category} spending ${topChange.change > 0 ? 'increased' : 'decreased'} by ${Math.abs(topChange.change).toFixed(0)}% (₹${Math.abs(topChange.absoluteChange).toFixed(0)}). ${topChange.change > 0
-                    ? `Consider setting a budget of ₹${(topChange.current * 0.8).toFixed(0)} for this category.`
-                    : 'Keep up the good work!'
-                }`
-            );
-        }
+        insights.push(
+            `Your ${topChange.category} spending ${topChange.change > 0 ? 'increased' : 'decreased'} by ${Math.abs(topChange.change).toFixed(0)}%.`
+        );
     }
 
     if (analysis.currentMonth.balance > 0) {
         const savingsRate = (analysis.currentMonth.balance / analysis.currentMonth.income) * 100;
         insights.push(
-            `You saved ₹${analysis.currentMonth.balance.toFixed(0)} this month (${savingsRate.toFixed(0)}% of income). ${savingsRate < 20
-                ? `Try to increase your savings rate to 20% by reducing expenses by ₹${((analysis.currentMonth.income * 0.2) - analysis.currentMonth.balance).toFixed(0)}.`
-                : 'Excellent savings rate!'
-            }`
-        );
-    } else {
-        insights.push(
-            `You're spending more than you earn this month. Try to reduce expenses by ₹${Math.abs(analysis.currentMonth.balance).toFixed(0)} to break even.`
-        );
-    }
-
-    if (insights.length < 3) {
-        insights.push(
-            `You've made ${analysis.currentMonth.transactionCount} transactions this month. Keep tracking to build better financial habits! 💪`
+            `You saved ₹${analysis.currentMonth.balance.toFixed(0)} this month (${savingsRate.toFixed(0)}% of income).`
         );
     }
 
