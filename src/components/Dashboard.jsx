@@ -10,6 +10,7 @@ import Charts from './Charts';
 import AIInsights from './AIInsights';
 import BudgetProgress from './BudgetProgress';
 import BudgetForm from './BudgetForm';
+import HealthScore from './HealthScore';
 
 const Dashboard = () => {
   const { clearAll } = useFinance();
@@ -56,9 +57,12 @@ const Dashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Top Section: Overview & Insights */}
+        {/* Top Section: Health & Overview & Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+              <HealthScore />
+            </div>
             <StatsCards />
             <AIInsights />
           </div>
