@@ -100,7 +100,7 @@ export const analyzeSpending = (transactions) => {
         changes: {
             expenseChange,
             incomeChange,
-            categoryChanges: categoryChanges.slice(0, 3) // Top 3 changes
+            categoryChanges: categoryChanges.slice(0, 3)
         }
     };
 };
@@ -256,6 +256,32 @@ export const predictAffordability = async (item, amount, transactions, budgets) 
     }
 };
 
+
+export const generateGoalAdvice = async (goals, transactions) => {
+    try {
+        const genAI = getAIClient();
+        if (!genAI || goals.length === 0) return null;
+
+        const analysis = analyzeSpending(transactions);
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        const prompt = `You are a financial motivator. Analyze these savings goals and provide a short, punchy, and highly motivating piece of advice (max 2 sentences) for the user to reach them.
+        
+        Goals: ${JSON.stringify(goals)}
+        Current Monthly Balance: ₹${analysis.currentMonth.balance}
+        Top Spending: ${JSON.stringify(analysis.currentMonth.categorySpending)}
+
+        Provide advice that is specific. If they have a high balance, encourage them to allocate more. If low, suggest a category to cut.
+        Return ONLY the advice string.`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text().trim();
+    } catch (error) {
+        console.error('Error generating goal advice:', error);
+        return null;
+    }
+};
 
 const getFallbackInsights = (transactions) => {
     const analysis = analyzeSpending(transactions);

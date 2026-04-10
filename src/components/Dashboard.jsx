@@ -13,6 +13,7 @@ import BudgetForm from './BudgetForm';
 import HealthScore from './HealthScore';
 import ExportReports from './ExportReports';
 import AffordabilityPredictor from './AffordabilityPredictor';
+import SavingsGoals from './SavingsGoals';
 
 const Dashboard = () => {
   const { clearAll } = useFinance();
@@ -59,7 +60,7 @@ const Dashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-   
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -70,6 +71,7 @@ const Dashboard = () => {
             <AIInsights />
           </div>
           <div className="lg:col-span-4 space-y-6">
+            <SavingsGoals />
             <BudgetProgress />
             <BudgetForm />
             <ExportReports />

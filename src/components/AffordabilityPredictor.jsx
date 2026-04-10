@@ -125,7 +125,6 @@ const AffordabilityPredictor = () => {
                 </div>
             )}
 
-            {/* Background sparkle */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl pointer-events-none rounded-full"></div>
         </div>
     );

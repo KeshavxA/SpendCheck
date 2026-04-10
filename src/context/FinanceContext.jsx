@@ -5,6 +5,8 @@ import {
   loadTransactions,
   saveBudgets,
   loadBudgets,
+  saveGoals,
+  loadGoals,
   clearStorage
 } from '../utils/storage';
 import { processRecurringTransactions, updateRecurringTransactions } from '../utils/recurringExpenses';
@@ -32,6 +34,11 @@ export const FinanceProvider = ({ children }) => {
     if (savedBudgets.length > 0) {
       dispatch({ type: ACTIONS.LOAD_BUDGETS, payload: savedBudgets });
     }
+
+    const savedGoals = loadGoals();
+    if (savedGoals.length > 0) {
+      dispatch({ type: ACTIONS.LOAD_GOALS, payload: savedGoals });
+    }
   }, []);
 
   useEffect(() => {
@@ -45,6 +52,12 @@ export const FinanceProvider = ({ children }) => {
       saveBudgets(state.budgets);
     }
   }, [state.budgets]);
+
+  useEffect(() => {
+    if (state.goals.length > 0 || localStorage.getItem('spendcheck_goals')) {
+      saveGoals(state.goals);
+    }
+  }, [state.goals]);
 
 
   useEffect(() => {
@@ -98,6 +111,18 @@ export const FinanceProvider = ({ children }) => {
     dispatch({ type: ACTIONS.DELETE_BUDGET, payload: category });
   };
 
+  const addGoal = (goal) => {
+    dispatch({ type: ACTIONS.ADD_GOAL, payload: goal });
+  };
+
+  const updateGoal = (goal) => {
+    dispatch({ type: ACTIONS.UPDATE_GOAL, payload: goal });
+  };
+
+  const deleteGoal = (id) => {
+    dispatch({ type: ACTIONS.DELETE_GOAL, payload: id });
+  };
+
   const clearAll = () => {
     if (window.confirm('Are you sure? This will delete all transactions and budgets.')) {
       clearStorage();
@@ -108,11 +133,15 @@ export const FinanceProvider = ({ children }) => {
   const value = {
     transactions: state.transactions,
     budgets: state.budgets,
+    goals: state.goals,
     addTransaction,
     editTransaction,
     deleteTransaction,
     upsertBudget,
     deleteBudget,
+    addGoal,
+    updateGoal,
+    deleteGoal,
     clearAll
   };
 

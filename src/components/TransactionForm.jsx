@@ -98,9 +98,9 @@ const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
       category: scannedData.category,
       description: scannedData.storeName ? `${scannedData.storeName}: ${scannedData.description}` : scannedData.description,
       date: scannedData.date || prev.date,
-      type: TRANSACTION_TYPES.EXPENSE // Scanners are usually for expenses
+      type: TRANSACTION_TYPES.EXPENSE
     }));
-    // Clear errors when scanned data is populated
+
     setErrors({});
   };
 

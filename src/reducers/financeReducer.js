@@ -7,12 +7,17 @@ export const ACTIONS = {
   PROCESS_RECURRING: 'PROCESS_RECURRING',
   UPSERT_BUDGET: 'UPSERT_BUDGET',
   DELETE_BUDGET: 'DELETE_BUDGET',
-  LOAD_BUDGETS: 'LOAD_BUDGETS'
+  LOAD_BUDGETS: 'LOAD_BUDGETS',
+  ADD_GOAL: 'ADD_GOAL',
+  UPDATE_GOAL: 'UPDATE_GOAL',
+  DELETE_GOAL: 'DELETE_GOAL',
+  LOAD_GOALS: 'LOAD_GOALS'
 };
 
 export const initialState = {
   transactions: [],
-  budgets: []
+  budgets: [],
+  goals: []
 };
 
 export function financeReducer(state, action) {
@@ -69,6 +74,32 @@ export function financeReducer(state, action) {
       return {
         ...state,
         budgets: action.payload
+      };
+
+    case ACTIONS.ADD_GOAL:
+      return {
+        ...state,
+        goals: [action.payload, ...state.goals]
+      };
+
+    case ACTIONS.UPDATE_GOAL:
+      return {
+        ...state,
+        goals: state.goals.map(g =>
+          g.id === action.payload.id ? action.payload : g
+        )
+      };
+
+    case ACTIONS.DELETE_GOAL:
+      return {
+        ...state,
+        goals: state.goals.filter(g => g.id !== action.payload)
+      };
+
+    case ACTIONS.LOAD_GOALS:
+      return {
+        ...state,
+        goals: action.payload
       };
 
     default:

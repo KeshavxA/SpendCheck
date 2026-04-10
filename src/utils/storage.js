@@ -1,6 +1,7 @@
 const STORAGE_KEYS = {
   TRANSACTIONS: 'spendcheck_data',
-  BUDGETS: 'spendcheck_budgets'
+  BUDGETS: 'spendcheck_budgets',
+  GOALS: 'spendcheck_goals'
 };
 
 export const saveTransactions = (transactions) => {
@@ -39,6 +40,26 @@ export const loadBudgets = () => {
     return data ? JSON.parse(data) : [];
   } catch (error) {
     console.error('Error loading budgets:', error);
+    return [];
+  }
+};
+
+export const saveGoals = (goals) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify(goals));
+    return true;
+  } catch (error) {
+    console.error('Error saving goals:', error);
+    return false;
+  }
+};
+
+export const loadGoals = () => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.GOALS);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Error loading goals:', error);
     return [];
   }
 };
