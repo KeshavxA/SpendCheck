@@ -11,13 +11,18 @@ export const ACTIONS = {
   ADD_GOAL: 'ADD_GOAL',
   UPDATE_GOAL: 'UPDATE_GOAL',
   DELETE_GOAL: 'DELETE_GOAL',
-  LOAD_GOALS: 'LOAD_GOALS'
+  LOAD_GOALS: 'LOAD_GOALS',
+  ADD_CHALLENGE: 'ADD_CHALLENGE',
+  UPDATE_CHALLENGE: 'UPDATE_CHALLENGE',
+  DELETE_CHALLENGE: 'DELETE_CHALLENGE',
+  LOAD_CHALLENGES: 'LOAD_CHALLENGES'
 };
 
 export const initialState = {
   transactions: [],
   budgets: [],
-  goals: []
+  goals: [],
+  challenges: []
 };
 
 export function financeReducer(state, action) {
@@ -100,6 +105,32 @@ export function financeReducer(state, action) {
       return {
         ...state,
         goals: action.payload
+      };
+
+    case ACTIONS.ADD_CHALLENGE:
+      return {
+        ...state,
+        challenges: [action.payload, ...state.challenges]
+      };
+
+    case ACTIONS.UPDATE_CHALLENGE:
+      return {
+        ...state,
+        challenges: state.challenges.map(c =>
+          c.id === action.payload.id ? action.payload : c
+        )
+      };
+
+    case ACTIONS.DELETE_CHALLENGE:
+      return {
+        ...state,
+        challenges: state.challenges.filter(c => c.id !== action.payload)
+      };
+
+    case ACTIONS.LOAD_CHALLENGES:
+      return {
+        ...state,
+        challenges: action.payload
       };
 
     default:

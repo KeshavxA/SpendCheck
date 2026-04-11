@@ -283,6 +283,52 @@ export const generateGoalAdvice = async (goals, transactions) => {
     }
 };
 
+export const generateSavingsChallenges = async (transactions) => {
+    try {
+        const genAI = getAIClient();
+        if (!genAI) return [];
+
+        const analysis = analyzeSpending(transactions);
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        const prompt = `You are a creative financial coach. Analyze these spending patterns and suggest 2-3 fun, actionable "Savings Challenges" for the next 7 days.
+        
+        Analysis:
+        - Monthly Balance: ₹${analysis.currentMonth.balance}
+        - Top Spending: ${JSON.stringify(analysis.currentMonth.categorySpending)}
+        - Category Changes: ${JSON.stringify(analysis.changes.categoryChanges)}
+
+        Create challenges that are specific. Example categories: Food, Shopping, Transport.
+        Return a JSON array of objects:
+        [
+          {
+            "id": "unique-id",
+            "title": "Challenge Name",
+            "description": "Short description of what to do.",
+            "targetAmount": number (the amount they should aim to stay under or save),
+            "category": "The specific category to track",
+            "difficulty": "Easy" | "Medium" | "Hard",
+            "reward": "Badge Name (e.g. Budget Hero)"
+          }
+        ]
+        
+        Return ONLY the JSON array. Use Indian Rupees (₹).`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+        return [];
+    } catch (error) {
+        console.error('Error generating challenges:', error);
+        return [];
+    }
+};
+
 const getFallbackInsights = (transactions) => {
     const analysis = analyzeSpending(transactions);
     const insights = [];

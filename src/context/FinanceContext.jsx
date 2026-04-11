@@ -7,6 +7,8 @@ import {
   loadBudgets,
   saveGoals,
   loadGoals,
+  saveChallenges,
+  loadChallenges,
   clearStorage
 } from '../utils/storage';
 import { processRecurringTransactions, updateRecurringTransactions } from '../utils/recurringExpenses';
@@ -39,6 +41,11 @@ export const FinanceProvider = ({ children }) => {
     if (savedGoals.length > 0) {
       dispatch({ type: ACTIONS.LOAD_GOALS, payload: savedGoals });
     }
+
+    const savedChallenges = loadChallenges();
+    if (savedChallenges.length > 0) {
+      dispatch({ type: ACTIONS.LOAD_CHALLENGES, payload: savedChallenges });
+    }
   }, []);
 
   useEffect(() => {
@@ -58,6 +65,12 @@ export const FinanceProvider = ({ children }) => {
       saveGoals(state.goals);
     }
   }, [state.goals]);
+
+  useEffect(() => {
+    if (state.challenges.length > 0 || localStorage.getItem('spendcheck_challenges')) {
+      saveChallenges(state.challenges);
+    }
+  }, [state.challenges]);
 
 
   useEffect(() => {
@@ -123,6 +136,18 @@ export const FinanceProvider = ({ children }) => {
     dispatch({ type: ACTIONS.DELETE_GOAL, payload: id });
   };
 
+  const addChallenge = (challenge) => {
+    dispatch({ type: ACTIONS.ADD_CHALLENGE, payload: challenge });
+  };
+
+  const updateChallenge = (challenge) => {
+    dispatch({ type: ACTIONS.UPDATE_CHALLENGE, payload: challenge });
+  };
+
+  const deleteChallenge = (id) => {
+    dispatch({ type: ACTIONS.DELETE_CHALLENGE, payload: id });
+  };
+
   const clearAll = () => {
     if (window.confirm('Are you sure? This will delete all transactions and budgets.')) {
       clearStorage();
@@ -134,6 +159,7 @@ export const FinanceProvider = ({ children }) => {
     transactions: state.transactions,
     budgets: state.budgets,
     goals: state.goals,
+    challenges: state.challenges,
     addTransaction,
     editTransaction,
     deleteTransaction,
@@ -142,6 +168,9 @@ export const FinanceProvider = ({ children }) => {
     addGoal,
     updateGoal,
     deleteGoal,
+    addChallenge,
+    updateChallenge,
+    deleteChallenge,
     clearAll
   };
 

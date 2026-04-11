@@ -14,6 +14,7 @@ import HealthScore from './HealthScore';
 import ExportReports from './ExportReports';
 import AffordabilityPredictor from './AffordabilityPredictor';
 import SavingsGoals from './SavingsGoals';
+import SavingsChallenges from './SavingsChallenges';
 
 const Dashboard = () => {
   const { clearAll } = useFinance();
@@ -68,6 +69,7 @@ const Dashboard = () => {
               <AffordabilityPredictor />
             </div>
             <StatsCards />
+            <SavingsChallenges />
             <AIInsights />
           </div>
           <div className="lg:col-span-4 space-y-6">
