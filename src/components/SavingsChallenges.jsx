@@ -5,7 +5,7 @@ import { generateSavingsChallenges } from '../services/aiService';
 import { formatCurrency, getMonthlyTransactions } from '../utils/calculations';
 
 const SavingsChallenges = () => {
-    const { challenges, addChallenge, deleteChallenge, transactions } = useFinance();
+    const { challenges, addChallenge, deleteChallenge, transactions, badges, addBadge } = useFinance();
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('active');
 
@@ -13,7 +13,7 @@ const SavingsChallenges = () => {
         setLoading(true);
         try {
             const rawChallenges = await generateSavingsChallenges(transactions);
-            // Only add challenges that aren't already active
+
             const newChallenges = rawChallenges.filter(rc => !challenges.some(c => c.title === rc.title));
 
             newChallenges.forEach(challenge => {
@@ -46,6 +46,16 @@ const SavingsChallenges = () => {
             percent,
             isFailed: currentSpent > challenge.targetAmount
         };
+    };
+
+    const handleClaimReward = (challenge) => {
+        addBadge({
+            name: challenge.reward,
+            date: new Date().toISOString(),
+            challengeTitle: challenge.title,
+            difficulty: challenge.difficulty
+        });
+        deleteChallenge(challenge.id);
     };
 
     const activeChallenges = challenges.filter(c => c.status === 'active');
@@ -92,14 +102,15 @@ const SavingsChallenges = () => {
                     <div className="space-y-4">
                         {activeChallenges.map(challenge => {
                             const progress = calculateProgress(challenge);
+                            const canClaim = !progress.isFailed;
 
                             return (
                                 <div key={challenge.id} className="group relative bg-gray-50 dark:bg-slate-700/30 rounded-2xl p-4 border border-transparent hover:border-indigo-100 dark:hover:border-indigo-900 transition-all">
                                     <div className="flex justify-between items-start mb-3">
                                         <div className="flex gap-3">
                                             <div className={`p-2 rounded-xl flex-shrink-0 ${challenge.difficulty === 'Easy' ? 'bg-green-100/50 text-green-600' :
-                                                    challenge.difficulty === 'Medium' ? 'bg-blue-100/50 text-blue-600' :
-                                                        'bg-purple-100/50 text-purple-600'
+                                                challenge.difficulty === 'Medium' ? 'bg-blue-100/50 text-blue-600' :
+                                                    'bg-purple-100/50 text-purple-600'
                                                 }`}>
                                                 <Trophy className="w-4 h-4" />
                                             </div>
@@ -134,7 +145,7 @@ const SavingsChallenges = () => {
                                         <div className="w-full h-1.5 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
                                             <div
                                                 className={`h-full transition-all duration-1000 ${progress.isFailed ? 'bg-red-500' :
-                                                        progress.percent > 80 ? 'bg-orange-500' : 'bg-indigo-500'
+                                                    progress.percent > 80 ? 'bg-orange-500' : 'bg-indigo-500'
                                                     }`}
                                                 style={{ width: `${progress.percent}%` }}
                                             ></div>
@@ -145,7 +156,14 @@ const SavingsChallenges = () => {
                                                 <Sparkles className="w-2.5 h-2.5" />
                                                 Reward: {challenge.reward}
                                             </div>
-                                            {!progress.isFailed && (
+                                            {canClaim && !progress.isFailed ? (
+                                                <button
+                                                    onClick={() => handleClaimReward(challenge)}
+                                                    className="text-[9px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded shadow-sm hover:bg-indigo-600 active:scale-95 transition-all"
+                                                >
+                                                    Claim Reward
+                                                </button>
+                                            ) : (
                                                 <div className="text-[9px] font-bold text-gray-400">
                                                     Ends in 7 days
                                                 </div>
@@ -160,14 +178,31 @@ const SavingsChallenges = () => {
             </div>
 
             <div className="p-4 bg-gray-50 dark:bg-slate-700/20 flex gap-2 overflow-x-auto no-scrollbar border-t border-gray-100 dark:border-slate-700">
-                <div className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700 flex items-center gap-2">
-                    <Trophy className="w-3 h-3 text-yellow-500" />
-                    <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300">Level 1: Novice</span>
-                </div>
-                <div className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700 flex items-center gap-2">
-                    <CheckCircle2 className="w-3 h-3 text-green-500" />
-                    <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300">0 Points</span>
-                </div>
+                {badges.length === 0 ? (
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 italic">
+                        <Trophy className="w-3 h-3 opacity-50" />
+                        No badges earned yet. Complete challenges to unlock!
+                    </div>
+                ) : (
+                    badges.map((badge, idx) => (
+                        <div key={idx} className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700 flex items-center gap-2 group cursor-help relative hover:scale-105 transition-all">
+                            <div className={`p-1 rounded-md ${badge.difficulty === 'Easy' ? 'bg-green-500/10 text-green-500' :
+                                badge.difficulty === 'Medium' ? 'bg-blue-500/10 text-blue-500' :
+                                    'bg-purple-500/10 text-purple-500'
+                                }`}>
+                                <Trophy className="w-3 h-3" />
+                            </div>
+                            <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300">{badge.name}</span>
+
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 hidden group-hover:block z-50">
+                                <div className="bg-gray-900 text-white text-[8px] p-2 rounded-lg shadow-xl border border-white/10">
+                                    <p className="font-black text-indigo-400 mb-0.5">{badge.name}</p>
+                                    <p className="opacity-70">Earned for completing "{badge.challengeTitle}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );

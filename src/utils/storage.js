@@ -2,7 +2,8 @@ const STORAGE_KEYS = {
   TRANSACTIONS: 'spendcheck_data',
   BUDGETS: 'spendcheck_budgets',
   GOALS: 'spendcheck_goals',
-  CHALLENGES: 'spendcheck_challenges'
+  CHALLENGES: 'spendcheck_challenges',
+  BADGES: 'spendcheck_badges'
 };
 
 export const saveTransactions = (transactions) => {
@@ -81,6 +82,26 @@ export const loadChallenges = () => {
     return data ? JSON.parse(data) : [];
   } catch (error) {
     console.error('Error loading challenges:', error);
+    return [];
+  }
+};
+
+export const saveBadges = (badges) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.BADGES, JSON.stringify(badges));
+    return true;
+  } catch (error) {
+    console.error('Error saving badges:', error);
+    return false;
+  }
+};
+
+export const loadBadges = () => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.BADGES);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Error loading badges:', error);
     return [];
   }
 };

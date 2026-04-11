@@ -9,6 +9,8 @@ import {
   loadGoals,
   saveChallenges,
   loadChallenges,
+  saveBadges,
+  loadBadges,
   clearStorage
 } from '../utils/storage';
 import { processRecurringTransactions, updateRecurringTransactions } from '../utils/recurringExpenses';
@@ -46,6 +48,11 @@ export const FinanceProvider = ({ children }) => {
     if (savedChallenges.length > 0) {
       dispatch({ type: ACTIONS.LOAD_CHALLENGES, payload: savedChallenges });
     }
+
+    const savedBadges = loadBadges();
+    if (savedBadges.length > 0) {
+      dispatch({ type: ACTIONS.LOAD_BADGES, payload: savedBadges });
+    }
   }, []);
 
   useEffect(() => {
@@ -71,6 +78,12 @@ export const FinanceProvider = ({ children }) => {
       saveChallenges(state.challenges);
     }
   }, [state.challenges]);
+
+  useEffect(() => {
+    if (state.badges.length > 0 || localStorage.getItem('spendcheck_badges')) {
+      saveBadges(state.badges);
+    }
+  }, [state.badges]);
 
 
   useEffect(() => {
@@ -148,6 +161,10 @@ export const FinanceProvider = ({ children }) => {
     dispatch({ type: ACTIONS.DELETE_CHALLENGE, payload: id });
   };
 
+  const addBadge = (badge) => {
+    dispatch({ type: ACTIONS.ADD_BADGE, payload: badge });
+  };
+
   const clearAll = () => {
     if (window.confirm('Are you sure? This will delete all transactions and budgets.')) {
       clearStorage();
@@ -160,6 +177,7 @@ export const FinanceProvider = ({ children }) => {
     budgets: state.budgets,
     goals: state.goals,
     challenges: state.challenges,
+    badges: state.badges,
     addTransaction,
     editTransaction,
     deleteTransaction,
@@ -171,6 +189,7 @@ export const FinanceProvider = ({ children }) => {
     addChallenge,
     updateChallenge,
     deleteChallenge,
+    addBadge,
     clearAll
   };
 

@@ -15,14 +15,17 @@ export const ACTIONS = {
   ADD_CHALLENGE: 'ADD_CHALLENGE',
   UPDATE_CHALLENGE: 'UPDATE_CHALLENGE',
   DELETE_CHALLENGE: 'DELETE_CHALLENGE',
-  LOAD_CHALLENGES: 'LOAD_CHALLENGES'
+  LOAD_CHALLENGES: 'LOAD_CHALLENGES',
+  ADD_BADGE: 'ADD_BADGE',
+  LOAD_BADGES: 'LOAD_BADGES'
 };
 
 export const initialState = {
   transactions: [],
   budgets: [],
   goals: [],
-  challenges: []
+  challenges: [],
+  badges: []
 };
 
 export function financeReducer(state, action) {
@@ -131,6 +134,19 @@ export function financeReducer(state, action) {
       return {
         ...state,
         challenges: action.payload
+      };
+
+    case ACTIONS.ADD_BADGE:
+      if (state.badges.some(b => b.name === action.payload.name)) return state;
+      return {
+        ...state,
+        badges: [action.payload, ...state.badges]
+      };
+
+    case ACTIONS.LOAD_BADGES:
+      return {
+        ...state,
+        badges: action.payload
       };
 
     default:
