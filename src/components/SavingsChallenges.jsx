@@ -5,9 +5,22 @@ import { generateSavingsChallenges } from '../services/aiService';
 import { formatCurrency, getMonthlyTransactions } from '../utils/calculations';
 
 const SavingsChallenges = () => {
-    const { challenges, addChallenge, deleteChallenge, transactions, badges, addBadge } = useFinance();
+    const { challenges, addChallenge, deleteChallenge, transactions, badges, addBadge, xp, addXP } = useFinance();
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('active');
+
+    // Level calculation logic
+    const level = Math.floor(xp / 1000) + 1;
+    const currentXP = xp % 1000;
+    const xpPercent = (currentXP / 1000) * 100;
+
+    const getLevelTitle = (lvl) => {
+        if (lvl >= 10) return 'Financial Legend';
+        if (lvl >= 7) return 'Money Maestro';
+        if (lvl >= 4) return 'Budget Elite';
+        if (lvl >= 2) return 'Finance Apprentice';
+        return 'Budget Novice';
+    };
 
     const handleGenerateChallenges = async () => {
         setLoading(true);
@@ -49,6 +62,10 @@ const SavingsChallenges = () => {
     };
 
     const handleClaimReward = (challenge) => {
+        // Award XP based on difficulty
+        const xpAmount = challenge.difficulty === 'Easy' ? 100 : challenge.difficulty === 'Medium' ? 250 : 500;
+        addXP(xpAmount);
+
         addBadge({
             name: challenge.reward,
             date: new Date().toISOString(),
@@ -159,9 +176,9 @@ const SavingsChallenges = () => {
                                             {canClaim && !progress.isFailed ? (
                                                 <button
                                                     onClick={() => handleClaimReward(challenge)}
-                                                    className="text-[9px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded shadow-sm hover:bg-indigo-600 active:scale-95 transition-all"
+                                                    className="text-[9px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded shadow-sm hover:bg-indigo-600 active:scale-95 transition-all animate-pulse"
                                                 >
-                                                    Claim Reward
+                                                    Claim {challenge.difficulty === 'Easy' ? '100' : challenge.difficulty === 'Medium' ? '250' : '500'} XP
                                                 </button>
                                             ) : (
                                                 <div className="text-[9px] font-bold text-gray-400">
@@ -177,32 +194,58 @@ const SavingsChallenges = () => {
                 )}
             </div>
 
-            <div className="p-4 bg-gray-50 dark:bg-slate-700/20 flex gap-2 overflow-x-auto no-scrollbar border-t border-gray-100 dark:border-slate-700">
-                {badges.length === 0 ? (
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 italic">
-                        <Trophy className="w-3 h-3 opacity-50" />
-                        No badges earned yet. Complete challenges to unlock!
-                    </div>
-                ) : (
-                    badges.map((badge, idx) => (
-                        <div key={idx} className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700 flex items-center gap-2 group cursor-help relative hover:scale-105 transition-all">
-                            <div className={`p-1 rounded-md ${badge.difficulty === 'Easy' ? 'bg-green-500/10 text-green-500' :
-                                badge.difficulty === 'Medium' ? 'bg-blue-500/10 text-blue-500' :
-                                    'bg-purple-500/10 text-purple-500'
-                                }`}>
-                                <Trophy className="w-3 h-3" />
-                            </div>
-                            <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300">{badge.name}</span>
+            <div className="p-4 bg-gray-50 dark:bg-slate-700/20 space-y-3 border-t border-gray-100 dark:border-slate-700">
+                <div className="flex flex-wrap gap-2 overflow-x-auto no-scrollbar pb-1">
+                    {badges.length === 0 ? (
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 italic">
+                            <Trophy className="w-3 h-3 opacity-50" />
+                            No badges earned yet. Complete challenges to unlock!
+                        </div>
+                    ) : (
+                        badges.map((badge, idx) => (
+                            <div key={idx} className="flex-shrink-0 px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700 flex items-center gap-2 group cursor-help relative hover:scale-105 transition-all">
+                                <div className={`p-1 rounded-md ${badge.difficulty === 'Easy' ? 'bg-green-500/10 text-green-500' :
+                                    badge.difficulty === 'Medium' ? 'bg-blue-500/10 text-blue-500' :
+                                        'bg-purple-500/10 text-purple-500'
+                                    }`}>
+                                    <Trophy className="w-3 h-3" />
+                                </div>
+                                <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300">{badge.name}</span>
 
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 hidden group-hover:block z-50">
-                                <div className="bg-gray-900 text-white text-[8px] p-2 rounded-lg shadow-xl border border-white/10">
-                                    <p className="font-black text-indigo-400 mb-0.5">{badge.name}</p>
-                                    <p className="opacity-70">Earned for completing "{badge.challengeTitle}"</p>
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 hidden group-hover:block z-50">
+                                    <div className="bg-gray-900 text-white text-[8px] p-2 rounded-lg shadow-xl border border-white/10">
+                                        <p className="font-black text-indigo-400 mb-0.5">{badge.name}</p>
+                                        <p className="opacity-70">Earned for completing "{badge.challengeTitle}"</p>
+                                    </div>
                                 </div>
                             </div>
+                        ))
+                    )}
+                </div>
+
+                <div className="pt-2 border-t border-black/5 dark:border-white/5 space-y-2">
+                    <div className="flex justify-between items-end">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white font-black text-xs">
+                                {level}
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black text-gray-400 uppercase leading-none mb-1">Level {level}</p>
+                                <p className="text-xs font-bold text-gray-900 dark:text-white leading-none">{getLevelTitle(level)}</p>
+                            </div>
                         </div>
-                    ))
-                )}
+                        <div className="text-right">
+                            <p className="text-[10px] font-black text-indigo-500 mb-0.5">{xp} XP</p>
+                            <p className="text-[9px] font-bold text-gray-400 capitalize">{1000 - currentXP} XP to next level</p>
+                        </div>
+                    </div>
+                    <div className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-1000"
+                            style={{ width: `${xpPercent}%` }}
+                        ></div>
+                    </div>
+                </div>
             </div>
         </div>
     );

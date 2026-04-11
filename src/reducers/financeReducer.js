@@ -17,7 +17,9 @@ export const ACTIONS = {
   DELETE_CHALLENGE: 'DELETE_CHALLENGE',
   LOAD_CHALLENGES: 'LOAD_CHALLENGES',
   ADD_BADGE: 'ADD_BADGE',
-  LOAD_BADGES: 'LOAD_BADGES'
+  LOAD_BADGES: 'LOAD_BADGES',
+  ADD_XP: 'ADD_XP',
+  LOAD_XP: 'LOAD_XP'
 };
 
 export const initialState = {
@@ -25,7 +27,8 @@ export const initialState = {
   budgets: [],
   goals: [],
   challenges: [],
-  badges: []
+  badges: [],
+  xp: 0
 };
 
 export function financeReducer(state, action) {
@@ -147,6 +150,18 @@ export function financeReducer(state, action) {
       return {
         ...state,
         badges: action.payload
+      };
+
+    case ACTIONS.ADD_XP:
+      return {
+        ...state,
+        xp: state.xp + action.payload
+      };
+
+    case ACTIONS.LOAD_XP:
+      return {
+        ...state,
+        xp: action.payload
       };
 
     default:

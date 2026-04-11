@@ -3,7 +3,8 @@ const STORAGE_KEYS = {
   BUDGETS: 'spendcheck_budgets',
   GOALS: 'spendcheck_goals',
   CHALLENGES: 'spendcheck_challenges',
-  BADGES: 'spendcheck_badges'
+  BADGES: 'spendcheck_badges',
+  XP: 'spendcheck_xp'
 };
 
 export const saveTransactions = (transactions) => {
@@ -103,6 +104,26 @@ export const loadBadges = () => {
   } catch (error) {
     console.error('Error loading badges:', error);
     return [];
+  }
+};
+
+export const saveXP = (xp) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.XP, JSON.stringify(xp));
+    return true;
+  } catch (error) {
+    console.error('Error saving XP:', error);
+    return false;
+  }
+};
+
+export const loadXP = () => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.XP);
+    return data ? JSON.parse(data) : 0;
+  } catch (error) {
+    console.error('Error loading XP:', error);
+    return 0;
   }
 };
 
