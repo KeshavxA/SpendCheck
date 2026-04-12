@@ -19,7 +19,15 @@ export const ACTIONS = {
   ADD_BADGE: 'ADD_BADGE',
   LOAD_BADGES: 'LOAD_BADGES',
   ADD_XP: 'ADD_XP',
-  LOAD_XP: 'LOAD_XP'
+  LOAD_XP: 'LOAD_XP',
+  ADD_ASSET: 'ADD_ASSET',
+  UPDATE_ASSET: 'UPDATE_ASSET',
+  DELETE_ASSET: 'DELETE_ASSET',
+  LOAD_ASSETS: 'LOAD_ASSETS',
+  ADD_LIABILITY: 'ADD_LIABILITY',
+  UPDATE_LIABILITY: 'UPDATE_LIABILITY',
+  DELETE_LIABILITY: 'DELETE_LIABILITY',
+  LOAD_LIABILITIES: 'LOAD_LIABILITIES'
 };
 
 export const initialState = {
@@ -28,7 +36,9 @@ export const initialState = {
   goals: [],
   challenges: [],
   badges: [],
-  xp: 0
+  xp: 0,
+  assets: [],
+  liabilities: []
 };
 
 export function financeReducer(state, action) {
@@ -162,6 +172,58 @@ export function financeReducer(state, action) {
       return {
         ...state,
         xp: action.payload
+      };
+
+    case ACTIONS.ADD_ASSET:
+      return {
+        ...state,
+        assets: [action.payload, ...state.assets]
+      };
+
+    case ACTIONS.UPDATE_ASSET:
+      return {
+        ...state,
+        assets: state.assets.map(a =>
+          a.id === action.payload.id ? action.payload : a
+        )
+      };
+
+    case ACTIONS.DELETE_ASSET:
+      return {
+        ...state,
+        assets: state.assets.filter(a => a.id !== action.payload)
+      };
+
+    case ACTIONS.LOAD_ASSETS:
+      return {
+        ...state,
+        assets: action.payload
+      };
+
+    case ACTIONS.ADD_LIABILITY:
+      return {
+        ...state,
+        liabilities: [action.payload, ...state.liabilities]
+      };
+
+    case ACTIONS.UPDATE_LIABILITY:
+      return {
+        ...state,
+        liabilities: state.liabilities.map(l =>
+          l.id === action.payload.id ? action.payload : l
+        )
+      };
+
+    case ACTIONS.DELETE_LIABILITY:
+      return {
+        ...state,
+        liabilities: state.liabilities.filter(l => l.id !== action.payload)
+      };
+
+    case ACTIONS.LOAD_LIABILITIES:
+      return {
+        ...state,
+        liabilities: action.payload
       };
 
     default:

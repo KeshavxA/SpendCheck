@@ -13,6 +13,10 @@ import {
   loadBadges,
   saveXP,
   loadXP,
+  saveAssets,
+  loadAssets,
+  saveLiabilities,
+  loadLiabilities,
   clearStorage
 } from '../utils/storage';
 import { processRecurringTransactions, updateRecurringTransactions } from '../utils/recurringExpenses';
@@ -60,6 +64,16 @@ export const FinanceProvider = ({ children }) => {
     if (savedXP > 0) {
       dispatch({ type: ACTIONS.LOAD_XP, payload: savedXP });
     }
+
+    const savedAssets = loadAssets();
+    if (savedAssets.length > 0) {
+      dispatch({ type: ACTIONS.LOAD_ASSETS, payload: savedAssets });
+    }
+
+    const savedLiabilities = loadLiabilities();
+    if (savedLiabilities.length > 0) {
+      dispatch({ type: ACTIONS.LOAD_LIABILITIES, payload: savedLiabilities });
+    }
   }, []);
 
   useEffect(() => {
@@ -97,6 +111,18 @@ export const FinanceProvider = ({ children }) => {
       saveXP(state.xp);
     }
   }, [state.xp]);
+
+  useEffect(() => {
+    if (state.assets.length > 0 || localStorage.getItem('spendcheck_assets')) {
+      saveAssets(state.assets);
+    }
+  }, [state.assets]);
+
+  useEffect(() => {
+    if (state.liabilities.length > 0 || localStorage.getItem('spendcheck_liabilities')) {
+      saveLiabilities(state.liabilities);
+    }
+  }, [state.liabilities]);
 
 
   useEffect(() => {
@@ -182,6 +208,30 @@ export const FinanceProvider = ({ children }) => {
     dispatch({ type: ACTIONS.ADD_XP, payload: amount });
   };
 
+  const addAsset = (asset) => {
+    dispatch({ type: ACTIONS.ADD_ASSET, payload: asset });
+  };
+
+  const updateAsset = (asset) => {
+    dispatch({ type: ACTIONS.UPDATE_ASSET, payload: asset });
+  };
+
+  const deleteAsset = (id) => {
+    dispatch({ type: ACTIONS.DELETE_ASSET, payload: id });
+  };
+
+  const addLiability = (liability) => {
+    dispatch({ type: ACTIONS.ADD_LIABILITY, payload: liability });
+  };
+
+  const updateLiability = (liability) => {
+    dispatch({ type: ACTIONS.UPDATE_LIABILITY, payload: liability });
+  };
+
+  const deleteLiability = (id) => {
+    dispatch({ type: ACTIONS.DELETE_LIABILITY, payload: id });
+  };
+
   const clearAll = () => {
     if (window.confirm('Are you sure? This will delete all transactions and budgets.')) {
       clearStorage();
@@ -196,6 +246,8 @@ export const FinanceProvider = ({ children }) => {
     challenges: state.challenges,
     badges: state.badges,
     xp: state.xp,
+    assets: state.assets,
+    liabilities: state.liabilities,
     addTransaction,
     editTransaction,
     deleteTransaction,
@@ -209,6 +261,12 @@ export const FinanceProvider = ({ children }) => {
     deleteChallenge,
     addBadge,
     addXP,
+    addAsset,
+    updateAsset,
+    deleteAsset,
+    addLiability,
+    updateLiability,
+    deleteLiability,
     clearAll
   };
 

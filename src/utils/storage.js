@@ -4,7 +4,9 @@ const STORAGE_KEYS = {
   GOALS: 'spendcheck_goals',
   CHALLENGES: 'spendcheck_challenges',
   BADGES: 'spendcheck_badges',
-  XP: 'spendcheck_xp'
+  XP: 'spendcheck_xp',
+  ASSETS: 'spendcheck_assets',
+  LIABILITIES: 'spendcheck_liabilities'
 };
 
 export const saveTransactions = (transactions) => {
@@ -124,6 +126,46 @@ export const loadXP = () => {
   } catch (error) {
     console.error('Error loading XP:', error);
     return 0;
+  }
+};
+
+export const saveAssets = (assets) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify(assets));
+    return true;
+  } catch (error) {
+    console.error('Error saving assets:', error);
+    return false;
+  }
+};
+
+export const loadAssets = () => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.ASSETS);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Error loading assets:', error);
+    return [];
+  }
+};
+
+export const saveLiabilities = (liabilities) => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.LIABILITIES, JSON.stringify(liabilities));
+    return true;
+  } catch (error) {
+    console.error('Error saving liabilities:', error);
+    return false;
+  }
+};
+
+export const loadLiabilities = () => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.LIABILITIES);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Error loading liabilities:', error);
+    return [];
   }
 };
 
