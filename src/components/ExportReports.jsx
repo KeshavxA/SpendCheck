@@ -1,15 +1,15 @@
-import { Download, FileText, FileSpreadsheet, CheckCircle2, ChevronRight, Share2 } from 'lucide-react';
+import { Download, FileText, FileSpreadsheet, CheckCircle2, ChevronRight, Share2, Upload } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { exportToCSV, exportToPDF } from '../utils/exportUtils';
 import { calculateFinancialHealthScore } from '../utils/healthScore';
 import { useState } from 'react';
+import CsvImportModal from './CsvImportModal';
 
 const ExportReports = () => {
-    const { transactions, budgets } = useFinance();
+    const { transactions, budgets, addTransaction } = useFinance();
     const [exporting, setExporting] = useState(false);
     const [success, setSuccess] = useState(false);
-
-    if (transactions.length === 0) return null;
+    const [importOpen, setImportOpen] = useState(false);
 
     const handleExport = (type) => {
         setExporting(true);
@@ -30,6 +30,13 @@ const ExportReports = () => {
         }
     };
 
+    const handleImport = (newTransactions) => {
+        if (!newTransactions.length) return;
+        newTransactions.forEach(t => addTransaction(t));
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+    };
+
     return (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 overflow-hidden relative">
             <div className="flex items-center justify-between mb-6">
@@ -40,7 +47,7 @@ const ExportReports = () => {
                 {success && (
                     <div className="flex items-center gap-1.5 text-green-500 text-xs font-bold animate-pulse">
                         <CheckCircle2 className="w-4 h-4" />
-                        Report Ready!
+                        Done!
                     </div>
                 )}
             </div>
@@ -50,10 +57,10 @@ const ExportReports = () => {
                     Generate professional financial reports for accounting, tax filing, or personal tracking.
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <button
                         onClick={() => handleExport('pdf')}
-                        disabled={exporting}
+                        disabled={exporting || transactions.length === 0}
                         className="group flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-all text-left w-full"
                     >
                         <div className="flex items-center gap-3">
@@ -70,7 +77,7 @@ const ExportReports = () => {
 
                     <button
                         onClick={() => handleExport('csv')}
-                        disabled={exporting}
+                        disabled={exporting || transactions.length === 0}
                         className="group flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-all text-left w-full"
                     >
                         <div className="flex items-center gap-3">
@@ -84,6 +91,22 @@ const ExportReports = () => {
                         </div>
                         <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
                     </button>
+
+                    <button
+                        onClick={() => setImportOpen(true)}
+                        className="group flex items-center justify-between p-4 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/20 transition-all text-left w-full"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="bg-white dark:bg-slate-800 p-2 rounded-lg shadow-sm">
+                                <Upload className="w-5 h-5 text-indigo-500" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-indigo-900 dark:text-indigo-100 uppercase tracking-tight">Import (CSV)</p>
+                                <p className="text-[11px] text-indigo-500/70 dark:text-indigo-400/70 font-medium">Bulk add transactions</p>
+                            </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+                    </button>
                 </div>
             </div>
 
@@ -96,6 +119,12 @@ const ExportReports = () => {
             </div>
 
             <div className="absolute -top-6 -left-6 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
+
+            <CsvImportModal
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                onImport={handleImport}
+            />
         </div>
     );
 };
