@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addMonths, addWeeks, addDays, isAfter, isBefore, startOfDay, format } from 'date-fns';
+import { addMonths, addWeeks, addDays, isBefore, startOfDay, format } from 'date-fns';
 
 export const RECURRING_FREQUENCIES = {
     DAILY: 'daily',

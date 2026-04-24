@@ -33,20 +33,6 @@ const SavingsGoals = () => {
         }
     };
 
-    const calculateCurrentAmount = (goal) => {
-
-        const totalIncome = transactions
-            .filter(t => t.type === 'income')
-            .reduce((sum, t) => sum + t.amount, 0);
-        const totalExpenses = transactions
-            .filter(t => t.type === 'expense')
-            .reduce((sum, t) => sum + t.amount, 0);
-
-        const totalSavings = Math.max(0, totalIncome - totalExpenses);
-
-        return goal.currentAmount || 0;
-    };
-
     return (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-6">
             <div className="flex items-center justify-between mb-6">
@@ -169,6 +155,7 @@ const SavingsGoals = () => {
 
             {showForm && (
                 <GoalForm
+                    key={editingGoal?.id ?? 'new'}
                     goal={editingGoal}
                     onClose={() => {
                         setShowForm(false);

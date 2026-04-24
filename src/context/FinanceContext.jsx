@@ -23,6 +23,7 @@ import { processRecurringTransactions, updateRecurringTransactions } from '../ut
 
 const FinanceContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useFinance = () => {
   const context = useContext(FinanceContext);
   if (!context) {

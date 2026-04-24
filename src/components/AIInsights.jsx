@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Sparkles, TrendingUp, AlertCircle, Loader2 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { generateAIInsights } from '../services/aiService';
@@ -10,7 +10,7 @@ const AIInsights = () => {
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
-    const fetchInsights = async () => {
+    const fetchInsights = useCallback(async () => {
         if (transactions.length === 0) {
             setInsights([]);
             return;
@@ -29,7 +29,7 @@ const AIInsights = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [transactions]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -37,7 +37,7 @@ const AIInsights = () => {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [transactions]);
+    }, [fetchInsights]);
 
     if (transactions.length === 0) {
         return (

@@ -117,7 +117,11 @@ const Dashboard = () => {
                 <AIInsights />
               </div>
               <div className="lg:col-span-4 space-y-8">
-                <TransactionForm editingTransaction={editingTransaction} onCancelEdit={handleCancelEdit} />
+                <TransactionForm
+                  key={editingTransaction?.id ?? 'new'}
+                  editingTransaction={editingTransaction}
+                  onCancelEdit={handleCancelEdit}
+                />
                 <BudgetProgress />
                 <SavingsGoals />
                 <ExportReports />

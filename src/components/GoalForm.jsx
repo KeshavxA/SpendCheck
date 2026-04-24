@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { X, Target, Save } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 
 const GoalForm = ({ goal, onClose }) => {
     const { addGoal, updateGoal } = useFinance();
-    const [formData, setFormData] = useState({
-        name: '',
-        targetAmount: '',
-        currentAmount: '',
-        deadline: '',
-        category: 'general'
-    });
-
-    useEffect(() => {
-        if (goal) {
-            setFormData({
-                ...goal,
-                targetAmount: goal.targetAmount.toString(),
-                currentAmount: goal.currentAmount.toString(),
-            });
+    const [formData, setFormData] = useState(() => {
+        if (!goal) {
+            return {
+                name: '',
+                targetAmount: '',
+                currentAmount: '',
+                deadline: '',
+                category: 'general'
+            };
         }
-    }, [goal]);
+
+        return {
+            ...goal,
+            targetAmount: goal.targetAmount?.toString?.() ?? '',
+            currentAmount: goal.currentAmount?.toString?.() ?? '',
+        };
+    });
 
     const handleSubmit = (e) => {
         e.preventDefault();

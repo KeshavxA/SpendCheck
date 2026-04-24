@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import { Repeat, Plus, Edit3 } from 'lucide-react';
@@ -13,23 +13,20 @@ import ReceiptScanner from './ReceiptScanner';
 const TransactionForm = ({ editingTransaction, onCancelEdit }) => {
   const { addTransaction, editTransaction } = useFinance();
 
-  const [formData, setFormData] = useState({
-    type: TRANSACTION_TYPES.EXPENSE,
-    amount: '',
-    category: '',
-    description: '',
-    date: format(new Date(), 'yyyy-MM-dd'),
-    isRecurring: false,
-    recurringFrequency: RECURRING_FREQUENCIES.MONTHLY
+  const [formData, setFormData] = useState(() => {
+    if (editingTransaction) return editingTransaction;
+    return {
+      type: TRANSACTION_TYPES.EXPENSE,
+      amount: '',
+      category: '',
+      description: '',
+      date: format(new Date(), 'yyyy-MM-dd'),
+      isRecurring: false,
+      recurringFrequency: RECURRING_FREQUENCIES.MONTHLY
+    };
   });
 
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    if (editingTransaction) {
-      setFormData(editingTransaction);
-    }
-  }, [editingTransaction]);
 
   const categories = formData.type === TRANSACTION_TYPES.EXPENSE
     ? EXPENSE_CATEGORIES

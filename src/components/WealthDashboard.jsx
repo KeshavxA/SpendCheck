@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Wallet, Landmark, TrendingUp, TrendingDown, Plus, Trash2, Edit2, Briefcase, CreditCard, ShieldCheck, Sparkles } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency } from '../utils/calculations';
 
@@ -22,7 +23,7 @@ const WealthDashboard = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const item = {
-            id: editingItem?.id || Date.now().toString(),
+            id: editingItem?.id || uuidv4(),
             ...formData,
             amount: parseFloat(formData.amount)
         };

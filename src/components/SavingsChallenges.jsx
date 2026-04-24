@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Trophy, Swords, Sparkles, Loader2, CheckCircle2, AlertCircle, X, Info, Flame, ChevronRight } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { generateSavingsChallenges } from '../services/aiService';
@@ -7,7 +7,6 @@ import { formatCurrency, getMonthlyTransactions } from '../utils/calculations';
 const SavingsChallenges = () => {
     const { challenges, addChallenge, deleteChallenge, transactions, badges, addBadge, xp, addXP } = useFinance();
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState('active');
 
     // Level calculation logic
     const level = Math.floor(xp / 1000) + 1;
